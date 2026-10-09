@@ -13,6 +13,9 @@ maps grow.
 
     ./scripts/enrich-index.py index/static
     ./scripts/enrich-index.py index/static --check     # CI: report, change nothing
+
+Dependencies:
+    python3-defusedxml (or pip install defusedxml)
 """
 
 import argparse
@@ -21,7 +24,7 @@ import os
 import re
 import sys
 from pathlib import Path
-from xml.etree import ElementTree
+from defusedxml.ElementTree import fromstring
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 
@@ -46,8 +49,8 @@ def screenshot_count(appdata):
     problem from an app that simply ships no screenshots.
     """
     try:
-        root = ElementTree.fromstring(appdata)
-    except ElementTree.ParseError:
+        root = fromstring(appdata)
+    except Exception:
         return None
     return len(root.findall(".//screenshot"))
 
