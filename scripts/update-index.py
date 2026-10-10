@@ -90,14 +90,29 @@ def build_image_entry(manifest_digest, config, tags, require_appstream):
     }
 
 
+def app_ref(image):
+    """The application an index image belongs to, via its Flatpak ref label."""
+    return (image.get("Labels") or {}).get("org.flatpak.ref")
+
+
 def merge_entry(index_data, repo_name, image_entry):
-    """Insert image_entry, replacing any existing image for the same arch."""
+    """Insert image_entry, replacing only the same application for the same arch.
+
+    One repository can serve several applications (e.g. the five installer
+    frontends under tuna-os/bootc-installer, told apart by org.flatpak.ref).
+    Replacing by architecture alone lets concurrent frontend publishes
+    overwrite each other until a single frontend is left standing, so the
+    replacement key is (architecture, application ref).
+    """
     for result in index_data.setdefault("Results", []):
         if result["Name"] == repo_name:
             result["Images"] = [
                 image
                 for image in result["Images"]
-                if image["Architecture"] != image_entry["Architecture"]
+                if not (
+                    image["Architecture"] == image_entry["Architecture"]
+                    and app_ref(image) == app_ref(image_entry)
+                )
             ]
             result["Images"].append(image_entry)
             result["Images"].sort(key=lambda image: image["Architecture"])

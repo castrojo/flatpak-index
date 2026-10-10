@@ -189,6 +189,53 @@ class PublisherTests(unittest.TestCase):
         self.assertEqual(compass["org.flatpak.ref"], "app/org.tunaos.compass/x86_64/master")
         self.assertIn("org.freedesktop.appstream.appdata", compass)
 
+    def test_two_apps_sharing_a_repo_and_arch_coexist(self):
+        # Five installer frontends publish under tuna-os/bootc-installer.
+        # Merging by architecture alone let concurrent frontend publishes
+        # overwrite each other until a single frontend was left standing.
+        index = {"Registry": "https://ghcr.io", "Results": []}
+        refs = [
+            "app/org.tunaos.InstallerCosmic/x86_64/stable",
+            "app/org.tunaos.InstallerGnome/x86_64/stable",
+        ]
+        for ref in refs:
+            labels = {**FLATPAK_LABELS, **APPSTREAM_LABELS, "org.flatpak.ref": ref}
+            _, entry = self.build_entry(labels)
+            update_index.merge_entry(index, "tuna-os/bootc-installer", entry)
+
+        images = index["Results"][0]["Images"]
+        self.assertEqual(len(images), 2)
+        got = sorted(image["Labels"]["org.flatpak.ref"] for image in images)
+        self.assertEqual(got, sorted(refs))
+
+    def test_republishing_one_app_leaves_the_other_app_alone(self):
+        index = {"Registry": "https://ghcr.io", "Results": []}
+        refs = [
+            "app/org.tunaos.InstallerCosmic/x86_64/stable",
+            "app/org.tunaos.InstallerGnome/x86_64/stable",
+        ]
+        for ref in refs:
+            labels = {**FLATPAK_LABELS, **APPSTREAM_LABELS, "org.flatpak.ref": ref}
+            _, entry = self.build_entry(labels)
+            update_index.merge_entry(index, "tuna-os/bootc-installer", entry)
+
+        labels = {
+            **FLATPAK_LABELS,
+            **APPSTREAM_LABELS,
+            "org.flatpak.ref": refs[0],
+        }
+        _, entry = self.build_entry(labels)
+        entry["Digest"] = "sha256:" + "f" * 64
+        update_index.merge_entry(index, "tuna-os/bootc-installer", entry)
+
+        images = index["Results"][0]["Images"]
+        self.assertEqual(len(images), 2)
+        by_ref = {
+            image["Labels"]["org.flatpak.ref"]: image["Digest"] for image in images
+        }
+        self.assertEqual(by_ref[refs[0]], "sha256:" + "f" * 64)
+        self.assertTrue(by_ref[refs[1]].startswith("sha256:"))
+
     def test_read_oci_layout_missing_index_file(self):
         missing_dir = self.tmp / "nonexistent-oci"
         with self.assertRaises(FileNotFoundError):
