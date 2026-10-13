@@ -36,7 +36,7 @@ Cloudflare Pages serves the remote at `https://tunaos.org/flatpak/`. The files c
 | Installer (COSMIC) | `flatpak install tuna-os org.tunaos.InstallerCosmic` |
 | Installer (XFCE) | `flatpak install tuna-os org.tunaos.InstallerXfce` |
 
-> The installer frontends drive the [fisherman](https://github.com/projectbluefin/fisherman)
+> The installer frontends drive the [fisherman](https://github.com/tuna-os/fisherman)
 > bootc backend and are preinstalled on the matching TunaOS live ISOs
 > (see `build_scripts/installer-frontend.sh` in [tuna-os/tunaOS](https://github.com/tuna-os/tunaOS)).
 
