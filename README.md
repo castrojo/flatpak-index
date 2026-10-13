@@ -15,7 +15,7 @@ flatpak remote-modify --system --authenticator-name=org.flatpak.Authenticator.Oc
 
 Use `--user` instead of `--system` if you added the remote for your user.
 
-Cloudflare Pages serves the remote at `https://tunaos.org/flatpak/`. The files come from the [tuna-os/docs](https://github.com/tuna-os/docs) repo.
+A Cloudflare Worker serves the remote at `https://tunaos.org/flatpak/`. The files come from the [tuna-os/docs](https://github.com/tuna-os/docs) repo.
 
 ## Available apps
 
@@ -231,7 +231,7 @@ The CI will:
 2. Export it as an OCI image
 3. Push to `ghcr.io/tuna-os/<app>:latest`
 4. Update the central index in `tuna-os/docs/static/flatpak/index/static`
-5. Cloudflare Pages redeploys `tunaos.org` with the new index
+5. Cloudflare Workers Builds redeploys `tunaos.org` with the new index
 
 ## App metadata
 
@@ -275,7 +275,7 @@ up as a bare application ID with an "Unknown" licence and no screenshots.
 User
   │ flatpak remote-add https://tunaos.org/flatpak/tuna-os.flatpakrepo
   ▼
-tunaos.org (Cloudflare Pages)
+tunaos.org (Cloudflare Worker)
   └── tuna-os.flatpakrepo     → points to oci+https://tunaos.org/flatpak
   └── index/static             → JSON index, lists all apps + OCI references
        │
