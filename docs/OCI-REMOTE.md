@@ -21,7 +21,8 @@ Our index lives at `https://tunaos.org/flatpak/index/static`. It names
 
 ## The Remote Descriptor
 
-Our `tuna-os.flatpakrepo` uses `Url=oci+https://tunaos.org/flatpak`.
+Our `tuna-os.flatpakrepo` sets `Url` to the `oci+` form of
+<https://tunaos.org/flatpak>.
 It declares no `AuthenticatorName`. Our backend registry is public GHCR.
 Installs work without one (verified with flatpak 1.14.6). No authenticator
 fixes the known `remote-info` 401 (see
@@ -74,6 +75,6 @@ flatpak install --user --no-deps --no-deploy --noninteractive tuna-os-test <app-
 flatpak remote-delete --user tuna-os-test
 ```
 
-`--no-deploy` downloads without installing. `--no-deps` skips the runtime
+`--no-deploy` downloads the app but does not install it. `--no-deps` skips the runtime
 so the check stays small. Expect `remote-info` to 401; that is the known
 limitation above, not a failure.

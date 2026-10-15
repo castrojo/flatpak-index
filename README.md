@@ -8,9 +8,9 @@ flatpak install tuna-os org.tunaos.mariner
 ```
 
 > **Note:** `flatpak remote-info` against this remote returns `error: Server
-> returned status 401`. That is a known limitation of the flatpak client
-> with OCI remotes (it fetches the manifest without the registry token
-> handshake), not a broken remote — see
+> returned status 401`. The flatpak client has this known limitation with OCI
+> remotes: it fetches the manifest without the registry token handshake. This
+> 401 does not show a fault in the remote; see
 > [#96](https://github.com/tuna-os/flatpak-index/issues/96).
 > The OCI authenticator does not change it. Check the remote with
 > `flatpak remote-ls` or with an install instead.
@@ -210,10 +210,10 @@ jobs:
 Also vendor [`scripts/update-index.py`](scripts/update-index.py) from this repo
 to `.github/scripts/update-index.py`, or use the `update-flatpak-index` action
 from `tuna-os/.github` (`tuna-os/.github/actions/update-flatpak-index`). **Prefer
-the composite action**: `tuna-os/.github`'s weekly drift check treats it, not
-this file, as canonical, and the two have drifted structurally before. See
-[AGENTS.md](AGENTS.md#three-copies-of-one-script) for the history and why this
-file is not covered by that check. Either way, do not copy an older version
+the composite action.** The weekly drift check in `tuna-os/.github` treats the
+action as canonical, not this file. In the past, they drifted apart.
+See [AGENTS.md](AGENTS.md#three-copies-of-one-script) for the history, and for
+why that check does not look at this file. Do not copy an older version
 from another app repository — see [App metadata](#app-metadata) for why.
 
 ### 4. Set repo secrets
@@ -265,10 +265,10 @@ as a bare application ID with an "Unknown" licence and no screenshots.
   instead of by hand. The audit below reports apps that declare none.
 - **Audit the live remote:**
 
-```bash
-curl -sSfL -o served-index.json https://tunaos.org/flatpak/index/static
-./scripts/enrich-index.py served-index.json --check
-```
+  ```bash
+  curl -sSfL -o served-index.json https://tunaos.org/flatpak/index/static
+  ./scripts/enrich-index.py served-index.json --check
+  ```
 
   This reports any published image whose metadata is missing from the index, or
   that has no metadata at all. Run daily by
