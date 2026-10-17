@@ -23,6 +23,19 @@ checks the system scope and reports nothing to update.
 Cloudflare Pages serves the remote at <https://tunaos.org/flatpak/>. The files come from the [tuna-os/docs](https://github.com/tuna-os/docs) repo.
 For the add, update, pause, and retire workflow, see the [application lifecycle runbook](docs/APP-LIFECYCLE.md).
 
+<!-- hive-contribute-plea: donated-compute appeal, keep in sync across repos -->
+## Contribute compute — no code needed
+
+**[Donate time with your AI CLI](https://hub.tunaos.org/#contribute).**
+
+Your machine runs one task at a time using your signed-in AI coding CLI.
+The relay alternates between eligible **School** (OS) and **Reef** (apps)
+hives after each task. If one hive has no work, the other can continue.
+
+The guide covers prerequisites, verified `just` setup, credentials, provider
+costs, and how to stop with Ctrl+C. Your subscription quota or API charges apply.
+Never post account credentials or API keys in issues or pull requests.
+
 ## Available apps
 
 | App | Install |
@@ -303,11 +316,3 @@ The `index/static` file is a JSON array with OCI image references. Each entry ma
 > **Note:** The authoritative index is `static/flatpak/index/static` in the [tuna-os/docs](https://github.com/tuna-os/docs) repo, served at <https://tunaos.org/flatpak/>. The copy of `index/static` in this repo is a **historical snapshot**, not what the remote serves. Treat it as reference only; the table (and tunaos.org) reflect the live remote.
 >
 > **This repo's [GitHub Pages site](https://tuna-os.github.io/flatpak-index/) and root `tuna-os.flatpakrepo` file are a non-authoritative snapshot.** Do not use `flatpak remote-add` on that URL or file. Always use the remote URL <https://tunaos.org/flatpak/tuna-os.flatpakrepo> from the [top of this README](#tunaos-flatpak-index).
-
-<!-- hive-contribute-plea: donated-compute appeal, keep in sync across repos -->
-## Contribute compute — no code needed
-
-No time to write code? You can still push this project's backlog forward. TunaOS AI-agent hives work on this repository. Lend a hive your AI subscription or API tokens, and your machine runs contributor tasks from this project's backlog.
-
-- 🪸 [Contribute compute to the reef hive](https://reef.tunaos.org/contribute)
-- 🏫 [Contribute compute to the school hive](https://school.tunaos.org/contribute)
