@@ -5,6 +5,7 @@ scripts, templates, and CI actions to build and audit the Flatpak remote in
 [README.md](README.md). It is not the live index. Cloudflare Pages serves the
 live index from `tuna-os/docs`; see the README's "Index format" section for
 that distinction.
+The [application lifecycle runbook](docs/APP-LIFECYCLE.md) covers the contributor steps for adding, updating, pausing, and retiring an application.
 
 ## Repository layout
 

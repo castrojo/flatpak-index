@@ -21,6 +21,7 @@ A user-scope remote needs `flatpak update --user`: plain `flatpak update`
 checks the system scope and reports nothing to update.
 
 Cloudflare Pages serves the remote at <https://tunaos.org/flatpak/>. The files come from the [tuna-os/docs](https://github.com/tuna-os/docs) repo.
+For the add, update, pause, and retire workflow, see the [application lifecycle runbook](docs/APP-LIFECYCLE.md).
 
 ## Available apps
 
