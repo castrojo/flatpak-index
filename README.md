@@ -148,6 +148,10 @@ jobs:
       options: --privileged
     steps:
       - uses: actions/checkout@v4
+        with:
+          # The build runs privileged Flatpak tooling; do not leave GITHUB_TOKEN
+          # in the checkout for build scripts or dependencies to read.
+          persist-credentials: false
       - name: Build Flatpak
         uses: flatpak/flatpak-github-actions/flatpak-builder@v6
         with:
@@ -171,6 +175,8 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
       - uses: actions/download-artifact@v4
         with:
           name: <app>-oci
