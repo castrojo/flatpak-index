@@ -1,8 +1,8 @@
 # Flatpak application lifecycle
 
-This repository contains index tooling and a reference snapshot. The production
-remote is served from `tuna-os/docs` at `https://tunaos.org/flatpak/`. Follow
-this distinction for every lifecycle change.
+This repository contains index tooling and a reference snapshot. Cloudflare
+Pages serves the production remote from `tuna-os/docs` at
+`https://tunaos.org/flatpak/`. Follow this distinction for every lifecycle change.
 
 ## Before changing an application
 
@@ -44,7 +44,7 @@ this distinction for every lifecycle change.
    ```
 
    This audit reads registry labels for the digests already named in the
-   served index. It reports missing metadata without changing the file.
+   served index. It reports missing metadata but does not change the file.
 
 ## Update an application
 
@@ -54,8 +54,8 @@ this distinction for every lifecycle change.
    updater replaces the matching application entry for the same architecture;
    it does not rewrite unrelated applications.
 3. Confirm the candidate has the intended app ID, immutable manifest digest,
-   architecture, channel, and AppStream labels before the production index is
-   pushed.
+   architecture, channel, and AppStream labels. Then push the production
+   index.
 4. Run the production verification commands above. Check the app entry and
    metadata from the served index, not only the local OCI directory.
 
@@ -65,16 +65,16 @@ For a local reference snapshot or a reviewed candidate index, run
 
 ## Pause publication
 
-The current updater has no `--pause` operation. Do not simulate a pause by
-silently deleting an entry or changing an image tag.
+The current updater has no `--pause` operation. Do not silently delete an entry
+or change an image tag to simulate a pause.
 
 1. Open a reviewed maintenance decision naming the app ID, reason, owner,
    start date, and whether existing installs remain supported.
 2. Coordinate the decision in the application repository and `tuna-os/docs`
-   before changing production. Do not disable or alter a publisher workflow
+   before you change production. Do not disable or alter a publisher workflow
    without maintainer approval.
-3. If the decision changes the production index, make that change in `tuna-os/docs`
-   through its normal review path and record the decision with it.
+3. If the decision changes the production index, update it in `tuna-os/docs`.
+   Follow the normal review path and include the decision.
 4. Run the served-index audit and record whether the app remains listed. A
    paused app must have an explicit reactivation or retirement owner; this
    repository does not automate that state.
@@ -87,7 +87,7 @@ Retirement therefore needs a coordinated, reviewed production change.
 1. Confirm the app ID, GHCR image, publisher workflow, supported users, and
    replacement or end-of-life notice.
 2. Stop future publisher updates through the application repository's normal
-   maintainer-controlled process before removing the production entry.
+   maintainer-controlled process before you remove the production entry.
 3. Remove the app entry in `tuna-os/docs` through review. Do not treat a change
    to this repository's reference snapshot as a retirement.
 4. Run the served-index audit and verify the retired app is absent from the
@@ -95,8 +95,8 @@ Retirement therefore needs a coordinated, reviewed production change.
 
 ## Checks
 
-From this repository, run the standard library test suite after documentation
-or script changes:
+From this repository, run the test suite, which uses the standard library,
+after documentation or script changes:
 
 ```sh
 python3 -m unittest discover -s tests -v
