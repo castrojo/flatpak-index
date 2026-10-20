@@ -56,8 +56,8 @@ paths. Even when source data is public, log only fields needed to diagnose the
 operation.
 
 Never emit registry tokens, authorization or cookie headers, credentials, URLs
-or query strings that contain secrets, or full environment dumps. Never emit
-complete HTTP responses, private label values, or unredacted AppStream payloads.
+or query strings that contain secrets, or full environment dumps.
+Never send complete HTTP responses, private label values, or unredacted AppStream payloads.
 Prefer a registry host over a full URL and a relative path over an absolute
 workspace path. Redact sensitive values before you construct a message. A CI
 log masker is not enough.
@@ -99,4 +99,4 @@ dependency or network destination, the proposal must document:
 Repository names, digests, refs, paths, and free-form error text must not become
 unbounded metric labels. Spans must not contain manifests, labels, AppStream
 XML, tokens, or HTTP bodies. Until maintainers approve such a proposal, the
-configuration must permit no off-box telemetry export.
+configuration must not let telemetry export go off-box.
