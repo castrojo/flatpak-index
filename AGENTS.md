@@ -75,13 +75,13 @@ only one is the failure mode this arrangement invites.
 ## Checks
 
 ```bash
-python3 -m unittest discover -s tests -v   # 43 tests
+python3 -m unittest discover -s tests -v
 ruff check .                               # config in ruff.toml
 ```
 
-> **`ruff` is configured but not enforced.** `tests.yml` runs the unittest
-> suite (and a screenshot capture); nothing runs ruff, so keep `ruff check .`
-> clean by hand.
+> **CI enforces Ruff and the unittest suite.** `tests.yml` runs `ruff check .`,
+> the unittest suite, and capture-action self-tests. Run both commands locally
+> before opening a PR; keep `ruff check .` clean.
 
 `scripts/oci.py` holds the registry plumbing, `enrich-index.py` the validation
 used by the live check above.
