@@ -20,7 +20,7 @@ sudo) for the whole machine. Then use the same scope to install and update.
 A user-scope remote needs `flatpak update --user`: plain `flatpak update`
 checks the system scope and reports nothing to update.
 
-`tunaos.org/flatpak/` is served by the `tunaos-org` Cloudflare Worker, with
+The `tunaos-org` Cloudflare Worker serves `tunaos.org/flatpak/`, with
 static assets from the [tuna-os/docs](https://github.com/tuna-os/docs) repo.
 For the add, update, pause, and retire workflow, see the [application lifecycle runbook](docs/APP-LIFECYCLE.md).
 
