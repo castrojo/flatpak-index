@@ -21,21 +21,20 @@ Our index lives at `https://tunaos.org/flatpak/index/static`. It names
 
 ## The Remote Descriptor
 
-The production descriptor at
-<https://tunaos.org/flatpak/tuna-os.flatpakrepo> is sourced from
-`tuna-os/docs`. It sets `Url` to the `oci+` form of
-<https://tunaos.org/flatpak> and currently declares
-`AuthenticatorName=org.flatpak.Authenticator.Oci` so Flatpak can obtain
-anonymous GHCR bearer tokens.
+The `tuna-os/docs` repository supplies the production descriptor at
+<https://tunaos.org/flatpak/tuna-os.flatpakrepo>. It sets `Url` to the
+`oci+` form of <https://tunaos.org/flatpak> and now declares
+`AuthenticatorName=org.flatpak.Authenticator.Oci` so Flatpak can get an
+anonymous token from GHCR.
 
 Do not confuse that production descriptor with this repository's root
-`tuna-os.flatpakrepo`. The root file is a non-authoritative GitHub Pages
-snapshot and intentionally has no `AuthenticatorName`.
+`tuna-os.flatpakrepo`. The root file is a snapshot on GitHub Pages that is not
+authoritative and intentionally has no `AuthenticatorName`.
 
-The authenticator is not a workaround for the known `remote-info` 401 (see
-[tuna-os/flatpak-index#96](https://github.com/tuna-os/flatpak-index/issues/96)):
-that client path still fetches the manifest without the registry token
-handshake. Do not remove the authenticator from the production descriptor.
+The authenticator does not fix the known `remote-info` 401 (see
+[tuna-os/flatpak-index#96](https://github.com/tuna-os/flatpak-index/issues/96)).
+That client path fetches the manifest without the registry token handshake.
+Keep the authenticator in the production descriptor.
 
 ## Install and Update (Client Side)
 
