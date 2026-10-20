@@ -1,8 +1,9 @@
 # Flatpak application lifecycle
 
-This repository contains index tooling and a reference snapshot. Cloudflare
-Pages serves the production remote from `tuna-os/docs` at
-`https://tunaos.org/flatpak/`. Follow this distinction for every lifecycle change.
+This repository contains index tooling and a reference snapshot. The
+`tunaos-org` Cloudflare Worker serves the production remote from `tuna-os/docs`
+at `https://tunaos.org/flatpak/`. Follow this distinction for every lifecycle
+change.
 
 ## Before changing an application
 
