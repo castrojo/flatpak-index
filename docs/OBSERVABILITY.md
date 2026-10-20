@@ -6,7 +6,7 @@ telemetry service.
 
 ## Current state
 
-This repository has no telemetry SDK, collector, metrics endpoint, tracing
+This repository has no telemetry SDK, collector, metrics endpoint, trace
 exporter, or external observability backend. Python scripts report through
 standard output, standard error, and process exit status. GitHub Actions may
 retain that output as a workflow log under the repository's normal retention
@@ -18,15 +18,15 @@ also downloads the public served index. Those requests are required index
 operations, not telemetry. They must remain limited to endpoints selected by
 the caller, input index, or workflow.
 
-**Policy:** diagnostics must not create off-box telemetry traffic. Adding an
-exporter, collector, analytics call, or error-reporting service requires the
-review described below. `index/static` and OCI labels are product data, not an
+**Policy:** diagnostics must not create off-box telemetry traffic. You must
+complete the review below before you add an exporter, collector, analytics
+call, or error report service. `index/static` and OCI labels are product data, not an
 observability store.
 
 ## Diagnostic contract
 
-Command output is human-readable. It is not a stable machine API; automation
-must use exit status and the generated index file instead of parsing prose.
+Command output is human-readable. It is not a stable machine API. Automation
+must use exit status and the index file. Automation must not parse prose.
 
 | Source | Normal signal | Warning or failure signal |
 |---|---|---|
@@ -37,15 +37,15 @@ must use exit status and the generated index file instead of parsing prose.
 New diagnostics must follow these conventions:
 
 - Send progress and successful summaries to stdout. Send warnings and errors to
-  stderr. Reserve non-zero exit status for an incomplete operation, failed
-  validation, or a check that found a required change.
+  stderr. Return a non-zero status when an operation is incomplete, validation
+  fails, or a check finds a required change.
 - State the operation, affected repository or relative file, and corrective
   action. Include architecture, bounded counts, and OCI digest when they help
   identify an index entry.
 - Keep one problem per line where practical so CI logs remain searchable.
 - Do not dump whole manifests, label maps, AppStream XML, or HTTP bodies.
-- Python's standard `logging` module may replace `print()` when level or output
-  routing is useful, but default output must remain dependency-free and
+- Python's standard `logging` module may replace `print()` when levels or output
+  destinations are useful, but default output must remain dependency-free and
   human-readable. Do not install network logging handlers.
 
 ## Privacy and data handling
@@ -55,14 +55,14 @@ digests, bounded aggregate counts, operation names, and repository-relative
 paths. Even when source data is public, log only fields needed to diagnose the
 operation.
 
-Never emit registry tokens, authorization or cookie headers, credentials,
-secret-bearing URLs or query strings, full environment dumps, complete HTTP
-responses, private label values, or unredacted AppStream payloads. Prefer a
-registry host over a full URL and a relative path over an absolute workspace
-path. Redact sensitive values before constructing a message; relying on a CI
-log masker is not sufficient.
+Never emit registry tokens, authorization or cookie headers, credentials, URLs
+or query strings that contain secrets, or full environment dumps. Never emit
+complete HTTP responses, private label values, or unredacted AppStream payloads.
+Prefer a registry host over a full URL and a relative path over an absolute
+workspace path. Redact sensitive values before you construct a message. A CI
+log masker is not enough.
 
-Diagnostics stay in the invoking terminal or the CI system already running the
+Diagnostics stay in the caller's terminal or the CI system that runs the
 command. Scripts must not transmit diagnostics, identifiers, or usage data to
 any additional endpoint. A telemetry failure must never block index generation
 because, under the current policy, no telemetry call should exist.
@@ -82,21 +82,21 @@ are the source of diagnostic evidence.
 
 ## Review path for metrics or tracing
 
-Future metrics, tracing, or error reporting must arrive as an explicit pull
-request and receive repository CODEOWNER review. Before adding any dependency
-or network destination, the proposal must document:
+Future metrics, traces, or error reports must arrive as an explicit pull
+request. CODEOWNERS for the repository must review it. Before you add any
+dependency or network destination, the proposal must document:
 
 1. operator question and why existing exit codes and workflow logs cannot
    answer it;
 2. exact fields and data classification, destination and protocol, retention,
    access controls, and deletion path;
 3. credential source and least-privilege permissions;
-4. bounded metric labels or span attributes, sampling, expected volume, and
+4. bounded metric labels or span attributes, sample rate, expected volume, and
    cost;
 5. timeout and failure behavior that cannot delay or fail index publication;
 6. an operator-controlled enablement and rollback plan.
 
 Repository names, digests, refs, paths, and free-form error text must not become
 unbounded metric labels. Spans must not contain manifests, labels, AppStream
-XML, tokens, or HTTP bodies. Until maintainers approve such a proposal, zero
-off-box telemetry export remains the required configuration.
+XML, tokens, or HTTP bodies. Until maintainers approve such a proposal, the
+configuration must permit no off-box telemetry export.
