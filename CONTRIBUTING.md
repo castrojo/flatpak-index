@@ -1,10 +1,10 @@
 # Contributing to flatpak-index
 
 Thank you for your work on the TunaOS Flatpak index. This repository holds
-scripts, templates, and CI actions to build and audit the Flatpak remote in
-[README.md](README.md). It is not the live index. Cloudflare Pages serves the
-live index from `tuna-os/docs`; see the README's "Index format" section for
-that distinction.
+scripts, templates, and CI actions to build and audit the Flatpak remote.
+[`README.md`](README.md) is the user guide; [`tuna-os/docs`](https://github.com/tuna-os/docs)
+owns the live index assets. The `tunaos-org` Cloudflare Worker serves the live
+index; see the README's "Index format" section for that distinction.
 The [runbook for the application lifecycle](docs/APP-LIFECYCLE.md) explains how contributors add, update, pause, and retire an application.
 
 <!-- hive-contribute-plea: donated-compute appeal, keep in sync across repos -->
