@@ -36,10 +36,7 @@ jobs:
       - uses: actions/setup-python@v7
         with:
           python-version: "3.15"
-      # A clean suite runs once. A failure increases the policy's confirmation
-      # threshold, but can never be tuned into a passing result.
-      - name: Run bounded Auto-QA
-        run: ./scripts/auto_qa.py
+      - run: python3 -m unittest discover -s tests -v
 
   # The capture action is consumed by other repos, so a defect in it only ever
   # surfaces as a red build somewhere else. It shipped asking for
