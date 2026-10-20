@@ -7,10 +7,10 @@ features and packaging roadmaps remain in their respective repositories.
 ## Current state
 
 The production remote at `https://tunaos.org/flatpak/` is served from
-`tuna-os/docs`, while this repository contains a historical index snapshot and
-a separate GitHub Pages deployment. Application repositories publish OCI
-images and are currently documented to push index updates directly to `docs`
-with a `FLATPAK_INDEX_TOKEN`.
+`tuna-os/docs` by the `tunaos-org` Cloudflare Worker, while this repository
+contains a historical index snapshot and a separate GitHub Pages deployment.
+Application repositories publish OCI images and are currently documented to
+push index updates directly to `docs` with a `FLATPAK_INDEX_TOKEN`.
 
 Until the consolidation decision below is complete, treat the index under
 `tuna-os/docs/static/flatpak/` as production and this repository as a reference

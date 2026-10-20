@@ -9,8 +9,9 @@ a new Flatpak), [`docs/`](docs/).
 ## This repo builds the index; it does not serve it
 
 The remote is served **from [`tuna-os/docs`](https://github.com/tuna-os/docs)**
-via Cloudflare Pages at `https://tunaos.org/flatpak/`. So publishing is a
-two-repo operation, and a correct index here can still be stale in production.
+via the `tunaos-org` Cloudflare Worker, which deploys that repository's static
+assets at `https://tunaos.org/flatpak/`. So publishing is a two-repo operation,
+and a correct index here can still be stale in production.
 
 That matters for CI: `check-metadata.yml` **curls the live served index** —
 
