@@ -48,40 +48,40 @@ being published. Do not narrow that tuple.
 declarations of one invariant. `tests/test_label_policy.py` pins them to each
 other — update both together, and let that test tell you if they've drifted.
 
-## Three copies of one script
+## Three copies of one script — the vendoring contract
 
-`scripts/update-index.py` describes itself as *the canonical copy*, vendored by
-application repositories at `.github/scripts/update-index.py` and run from
-their publish workflow after `flatpak build-bundle --oci`. A third lives in
-`tuna-os/.github` as the `update-flatpak-index` composite action.
+`scripts/update-index.py` is the **single source of truth**. It is vendored,
+byte-for-byte, by application repositories at `.github/scripts/update-index.py`
+and by the `update-flatpak-index` composite action in `tuna-os/.github`. No copy
+is hand-edited in place: a change belongs here first, then propagates to the
+others.
 
-They have **drifted structurally** — this copy is 146 lines, the composite
-action's is 118 — while currently agreeing on the label behaviour above.
+The sync guard is `flatpak-tooling-drift-check.yml` in `tuna-os/.github`. It
+reads the SHA of *this* file from `tuna-os/flatpak-index` and fails the run when
+any vendored copy differs, so "matches the composite action" means "matches this
+file". That weekly check is the only thing standing between these copies and
+silent divergence — keep it green.
 
-There *is* a sync check, and it does not cover this file.
-`flatpak-tooling-drift-check.yml` in `tuna-os/.github` runs weekly and compares
-eight application repos' `.github/scripts/update-index.py` against
-`.github/actions/update-flatpak-index/update-index.py`, which it treats as
-canonical. `tuna-os/flatpak-index` is not in its list. So this file's docstring
-claim to be "the canonical copy" is both unchecked and contradicted by the
-org's own definition — and the two disagree today (blob `b7dc0458` here,
-`6eaa8186` there).
+Change boundaries:
 
-That check has also been failing on every scheduled run since 2026-08-17.
+- **Internals are free; propagate them.** Implementation details that do not
+  change the CLI, the index format, or which labels are kept can be edited here;
+  the same edit must then be copied to every vendored spot.
+- **The public interface is shared; coordinate it.** The CLI contract, the index
+  format (including the `ApplicationMetadata` block that `APP_LEVEL_LABELS` feeds
+  into), and `KEEP_LABEL_PREFIXES` are identical across every copy. Change them
+  here and treat the change as unmerged until the sync check has been re-run. A
+  fix landing in only one copy is the failure mode this arrangement invites.
 
-When you change this file, check the other two deliberately; a fix landing in
-only one is the failure mode this arrangement invites.
+`tests/test_label_policy.py` pins the label-filter half of that contract to
+`scripts/oci.py` (the auditor); `tests/test_app_level_labels_contract.py` pins
+the index-format half. Together they catch the two ways the copies diverge:
+label filtering and the `ApplicationMetadata` format.
 
-## Checks
-
-```bash
-python3 -m unittest discover -s tests -v
-ruff check .                               # config in ruff.toml
-```
-
-> **CI enforces Ruff and the unittest suite.** `tests.yml` runs `ruff check .`,
-> the unittest suite, and capture-action self-tests. Run both commands locally
-> before opening a PR; keep `ruff check .` clean.
+Current state: the composite-action copy in `tuna-os/.github` predates the
+`ApplicationMetadata` work (#146) and still lacks `APP_LEVEL_LABELS`, so it
+differs from canonical and the sync check flags it. Syncing that copy is a
+change in `tuna-os/.github`, not here.
 
 `scripts/oci.py` holds the registry plumbing, `enrich-index.py` the validation
 used by the live check above.
