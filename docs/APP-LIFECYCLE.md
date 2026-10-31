@@ -106,3 +106,30 @@ python3 -m unittest discover -s tests -v
 If a publication changed metadata, also run the served-index audit. A non-zero
 `--check` result means the live index needs review; it is not proof that the
 application build failed.
+
+## Keep the advertised catalog in sync
+
+The production declaration at
+<https://tunaos.org/flatpak/expected-apps.json> is the source of app IDs and
+required architectures. When you add, rename, or retire an app, edit
+`static/flatpak/expected-apps.json` in `tuna-os/docs`. Make this change
+together with the production index and publisher changes described above. Use
+`id` for one app or `ids` for a registry entry that publishes multiple apps
+(such as the installer); `archs` applies to every declared ID. Keep optional
+future architectures in `archs_planned` until the remote serves them.
+
+Update the Available apps table in this repository's README to match those
+IDs exactly, including case. Do not add a local copy of the declaration. To
+check a proposed declaration before the docs deploy publishes it:
+
+```sh
+python3 scripts/catalog.py ../docs/static/flatpak/expected-apps.json --readme README.md
+python3 scripts/catalog.py ../docs/static/flatpak/expected-apps.json --index served-index.json
+```
+
+On each pull request, CI compares the README IDs with the served declaration.
+The scheduled check of the remote also compares the served index with the
+declaration. Each served registry and app ID must be in the declaration. The
+architecture of each ref must match its image. The remote must serve each
+required pair of ID and architecture. Coordinate changes across the two
+repositories; a deployment between their merges can temporarily fail parity.
