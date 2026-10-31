@@ -1,54 +1,77 @@
 # Check-metadata failures
 
 `check-metadata.yml` is the only production health check that this repository
-owns. The workflow runs every day at 06:17 UTC and by manual request. It
-compares the served Flatpak remote against the registry. It reports metadata
-that software centres need.
+owns. The workflow runs every day at 06:17 UTC and by manual request. It audits
+the served Flatpak remote against the registry and against the production
+catalog declaration.
 
 This runbook explains what the check validates, how to read a red run, and who
 fixes each failure.
 
 ## What the check validates
 
-The workflow fetches the served index and audits it:
+The workflow downloads the served index and the production declaration, then
+runs these checks in this order:
 
 ```sh
 curl -sSfL -o served-index.json https://tunaos.org/flatpak/index/static
+curl -sSfL -o expected-apps.json https://tunaos.org/flatpak/expected-apps.json
+python3 scripts/catalog.py expected-apps.json --readme README.md --index served-index.json
 ./scripts/enrich-index.py served-index.json --check
+FLATPAK_INDEX_FILE=served-index.json python3 -m unittest tests/test_index.py -v
 ```
 
-`enrich-index.py --check` reads the AppStream labels that the registry publishes
-for each digest in the served index. It reports a failure when an entry lacks
-metadata that software centres need. It prints warnings for entries that install
-correctly but show an empty frame in a software centre. A red run means at least
-one failure. A green run means the served index matches the registry.
+`catalog.py` compares the served index and the README with
+`expected-apps.json`. It reports a served registry or app ID that the
+declaration does not list. It reports a declared pair of app ID and
+architecture that the remote does not serve. It also reports README install IDs
+that differ from the declaration.
 
-The check reads the served index from `tuna-os/docs`, not this repository's
-`index/static` snapshot. A failure may mean the production index is stale. It may
-not mean a fault in this repository.
+`enrich-index.py --check` audits every digest in the served index. For each
+digest, it reads the AppStream labels that the registry publishes. It does not
+read `expected-apps.json`. It reports a failure when an entry lacks metadata
+that software centres need. It prints warnings for entries that install
+correctly but show an empty frame in a software centre.
+
+`tests/test_index.py` checks the structure of the served index: digests, media
+types, Flatpak labels, image sizes, and the AppStream catalogue.
+
+A red run means at least one check failed. The workflow stops at the first
+step that fails, so a later check may not have run. The check reads the served
+index from `tuna-os/docs`, not from this repository. A failure may mean that the
+production index is stale. It may not mean a fault in this repository.
 
 ## What the check does not validate
 
-The check audits only the applications that `tuna-os/docs` lists in
-`expected-apps.json`. The check does not audit a served application that
-`expected-apps.json` omits. See issue #98 for this gap.
-
-The check also gives no alert. A red run is a failed Actions job. No page,
-message, or email follows it. A person must notice the red run and open a task.
-Issue #138 tracks the plan to add alerting.
+The check does not install an application. It does not confirm that a registry
+tag still points at the digest that the served index records.
 
 ## Read a red run
 
-A red run prints lines that start with `!` for failures and `~` for warnings.
-Read the `!` lines first. Each names an application and an architecture. Match
-each failure to one root cause below. The fix lives in a different repository
-for each cause.
+Find the step that failed first. The step name tells you which check failed.
+
+For `catalog.py`, each line shows one difference. For
+`enrich-index.py`, a red run prints lines that start with `!` for failures and
+`~` for warnings. Read the `!` lines first. Each line names an application and
+an architecture. Match each failure to one root cause below. The fix lives in a
+different repository for each cause.
+
+### Catalog mismatch
+
+Symptom: `catalog.py` prints `undeclared registry entry`, `invalid or
+undeclared ref`, `missing <id> on <arch>`, or a README difference.
+
+An app reached the remote without a declaration, or a declared app is not on
+the remote, or the README table differs from the declaration. Update
+`static/flatpak/expected-apps.json` in `tuna-os/docs`, or the README table in
+this repository. See
+[Keep the advertised catalog in sync](APP-LIFECYCLE.md#keep-the-advertised-catalog-in-sync).
 
 ### Stale served index
 
-Symptom: the run reports that the served index misses labels. The registry has
-these labels. The production index in `tuna-os/docs` has no new publish yet, or
-the Cloudflare Pages deploy has not finished.
+Symptom: the run prints `image(s) are missing labels present in the registry`.
+The registry has these labels. The production index in `tuna-os/docs` has no
+new publish yet, or the Cloudflare Pages deploy has not finished.
 
 This is a deployment lag. It is not a metadata fault. Wait for the next publish
 of `tuna-os/docs`. Wait for the Pages deploy to propagate. Re-run the check after
@@ -75,8 +98,8 @@ be unavailable. Wait, and re-run.
 
 ### Malformed catalogue
 
-Symptom: the run prints `AppStream catalogue does not parse`. The metainfo XML
-of the application is malformed.
+Symptom: the run prints `AppStream catalogue does not parse`. The application
+has metainfo XML that the parser cannot read.
 
 Fix the metainfo XML in the application repository. Publish a new image, and
 re-run the served-index audit.
@@ -85,8 +108,10 @@ re-run the served-index audit.
 
 1. Re-run the check to prove the failure is real. A propagation delay clears on
    the next run.
-2. Read the `!` lines. Match each failure to a root cause.
+2. Read the output of the failed step. Match each failure to a root cause.
 3. Route the fix:
+   - Catalog mismatch: update the declaration in `tuna-os/docs` or the README
+     table here. Owner: the person who adds, renames, or retires the app.
    - Stale served index: redeploy `tuna-os/docs`. Owner: the deployer.
    - Missing metadata or malformed catalogue: fix the application repository.
      Owner: the application maintainer.
